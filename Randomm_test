@@ -1,0 +1,84 @@
+#These file contains different cyrptographical function and here basic use
+#The tests are not structured but just to give you a go of how they are implemented
+
+from Crypto.Cipher import AES
+from colorama import *
+import getpass
+from Crypto import Random
+from hashlib import md5
+from Crypto.Hash import MD5
+from Crypto.Hash import SHA256
+from Crypto.Hash import HMAC
+from Crypto.PublicKey import RSA
+
+#def pad(s):
+    #retrun s + (16 - len(s) % 16) * '}'
+
+#block_size = 16
+#padding = '@'
+
+#def pad(s):
+    #s + (block_size - len(s) % block_size) * padding
+#def pad(s):
+    #s + b'\0' * (block_size - len(s) % block_size)
+#def decrypty():
+    #return plaintext.rstrip(b'\0')
+
+init()
+print(Fore.GREEN + 'Hello welcome to login shell')
+print (Fore.RESET + 'please enter a password')
+print (Fore.GREEN + '-----------------------\n\n:')
+
+
+password = getpass.getpass()
+print(Fore.RESET + Style.RESET_ALL)
+code = SHA256.new(password).hexdigest()
+print (code)
+
+key = b'0123456789absdef'
+iv = Random.new().read(16)
+mode = AES.MODE_CBC
+
+encryptor = AES.new(key, mode, iv)
+plain = 'length must be16'
+ciphertext = encryptor.encrypt(plain)
+
+print 'this is an encrypted text:',ciphertext
+
+encryptor2 = AES.new(key, mode, iv)
+dec = encryptor2.decrypt(ciphertext)
+print ('this is my ..', dec)
+
+print 'after encrypting the plain text: ',dec
+############# RSA #######################
+rng = Random.new().read
+RSAKey = RSA.generate(1024, rng)
+sh = MD5.new(plain).digest()
+signature = RSAKey.sign(sh,rng)
+print('this is my RSAkey',signature)
+
+print RSAKey.verify(sh[:-1],signature)
+
+
+#########HASH FUNCTONS############
+
+m= MD5.new()
+print m.update('we are almost there')
+print m.digest()
+print  m.hexdigest()
+
+k = SHA256.new()
+k.update('I am at home dear')
+print k.digest()
+print k.hexdigest()
+print k.digest_size
+
+h = md5()
+h.update
+
+t = HMAC.new(key, plain, SHA256)
+print 'this is my HMAC digest', t.digest()
+print t.digest_size
+print t.digestmod
+
+
