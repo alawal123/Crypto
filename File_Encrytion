@@ -1,0 +1,101 @@
+#importing packages and libraries
+
+
+from Crypto.Cipher import AES
+from Crypto import Random
+import Tkinter
+import tkFileDialog
+import tkMessageBox
+
+key = Random.new().read(16) #generates the symmetric encrytion key to be used  
+print 'this is my key', key
+mode = AES.MODE_CBC         # encrytpion mode is Cipher Block Chaining mode (CBC) and encrypt on a block of either 16, 24 0r 32 byte
+iv = Random.new().read(16)  # Generates random bytes to be used with the cipher so as to reduce chances of guessing or MITM attack
+print 'this is m iv', iv
+
+
+
+def pad(s): 
+
+''We are using AES and rncrytps in block, this fucntion erves as a gap filler
+for input that are lower or hiher than the chosen block size. It helps make all the block 
+multiples of 16. The number 16 is our chosen block size from {AES.block_size}. You may want to
+use higher blocksize like 24 or 32''
+
+    return s + (AES.block_size - len(s) % AES.block_size) * b'\0'
+
+def encryption(message, key, key_size=256): 
+    message = pad(message)
+    global iv
+    cipher = AES.new(key, AES.MODE_CBC, iv) #AES object whcih produce the cipher that scramble plaintext
+    return iv + cipher.encrypt(message) #returns complete cipher with the iv (random byte generator)
+
+
+def decryption(ciphertext, key):
+    global iv
+    cipher = AES.new(key, AES.MODE_CBC, iv)
+    plaintext = cipher.decrypt(ciphertext[16:])
+    return plaintext.rstrip(b'\0')
+
+message = 'classified secret reveal at the expense of ur job'
+enc = encryption(message,key)
+print 'That is my ',enc
+
+dec = decryption(enc, key)
+print dec
+
+#encrypt a file
+
+filename = None
+def encrypt_file(file_name, key):
+    with open(file_name, 'rb') as f:
+        plaintext= f.read()
+    enc = encryption(file_name, key)
+    with  open(file_name + '.enc', 'wb') as f:
+        f.write(enc)
+
+def decrypt_file(file_name, key):
+    with open(file_name, 'rb') as f:
+        ciphertext = f.read()
+    dec = decryption(ciphertext, key)
+    with open(file_name[:-4], 'wb') as f:
+        f.write(dec)
+
+# get the textfile from the user
+
+def load_file():
+    global key, filename
+    text_file = tkFileDialog.askopenfile(filetypes=[('Text files', 'txt')])
+    if text_file.name != None:
+        filename = text_file.name
+
+def encrypt_the_file():
+    global filename, key
+    if filename != None:
+        encrypt_file(filename, key)
+    else:
+        tkMessageBox.showerror(title='Error', message= 'There was no file loaded to encrypt')
+
+def decrypt_the_file():
+    global filename, key
+    if filename != None:
+        fname = filename + '.enc'
+        decrypt_file(fname, key)
+    else:
+         tkMessageBox.showerror(title='Error', message= 'There was no file loaded to decrypt')
+
+root = Tkinter.Tk()
+root.title('cryptofile')
+
+loadButton = Tkinter.Button(root, text = 'load text file', command = load_file())
+encryptButton = Tkinter.Button(root, text = 'encrypt file', command = encrypt_the_file())
+decryptButton = Tkinter.Button(root, text = 'decrypt file', command = decrypt_the_file())
+
+loadButton.pack()
+encryptButton.pack()
+decryptButton.pack()
+
+root.mainloop()
+
+
+
