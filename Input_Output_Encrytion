@@ -8,7 +8,7 @@ import base64
 
 
 
-message = raw_input('TBello encrypt any code: ')
+message = raw_input(' Encrypt any code: ')
 
 key = Random.new().read(16)
 iv = Random.new().read(16)
