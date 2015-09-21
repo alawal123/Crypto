@@ -1,0 +1,56 @@
+#This script encrypt/decrypt any message received from user input. 
+
+from Crypto.Cipher import AES
+from Crypto.Hash import HMAC
+from Crypto.Hash import SHA256
+from Crypto import Random
+import base64
+
+
+
+message = raw_input('TBello encrypt any code: ')
+
+key = Random.new().read(16)
+iv = Random.new().read(16)
+mode = AES.MODE_CBC
+
+
+
+def pad(s):
+    return s + (16 - len(s) % 16) * '@'
+
+def encrypted(plaintext):
+    global mode
+    global iv
+    global key
+    cipher = AES.new(key, mode, iv)
+    scrambled = cipher.encrypt(pad(plaintext))
+    hashing = HMAC.new(key, scrambled,SHA256) #SHA256 module must be imported
+    hashing.digest()
+    print('This is the encrypted message: ',scrambled)
+    print('Our hashed cipher with a key: ', hashing.digest())
+    print(type(scrambled))
+    return scrambled
+
+
+def decrypted(text):
+    global key
+    global mode
+    global iv
+    cipher2 = AES.new(key, mode, iv)
+    plaintext = cipher2.decrypt(text)
+    x = plaintext.rstrip('@')
+    print(type(plaintext))
+    print 'this is your result', x
+
+x = encrypted(message)
+decrypted(x)
+
+
+
+
+
+
+
+
+
